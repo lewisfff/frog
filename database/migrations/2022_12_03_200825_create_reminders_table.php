@@ -20,9 +20,9 @@ return new class extends Migration
             $table->timestamps();
             $table->dateTime('date')->nullable();
             $table->string('message');
-            $table->foreignId('channel_id');
-            $table->foreignId('message_id');
-            $table->foreignId('user_id')->constrained();
+            $table->bigInteger('channel_id');
+            $table->bigInteger('message_id');
+            $table->bigInteger('user_id');
         });
     }
 
