@@ -1,0 +1,2 @@
+Added a changelog
+Added tests for a reminder service
