@@ -20,8 +20,8 @@ return new class extends Migration
             $table->timestamps();
             $table->dateTime('date')->nullable();
             $table->string('message');
-            $table->foreignId('channel_id')->constrained();
-            $table->foreignId('message_id')->constrained();
+            $table->foreignId('channel_id');
+            $table->foreignId('message_id');
             $table->foreignId('user_id')->constrained();
         });
     }
