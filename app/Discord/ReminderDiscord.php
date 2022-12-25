@@ -40,7 +40,7 @@ class ReminderDiscord
                     );
                 }
 
-                $message->reply(MessageBuilder::new()->setContent('test')->addEmbed($embed));
+                $message->reply(MessageBuilder::new()->addEmbed($embed));
             }
         });
     }
