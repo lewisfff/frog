@@ -4,9 +4,12 @@ namespace App\Discord;
 
 use App\Models\Reminder;
 use App\Services\ReminderService;
+use Discord\Builders\MessageBuilder;
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
+use Discord\Parts\Embed\Embed;
 use Discord\WebSockets\Event;
+use Illuminate\Support\Str;
 
 class ReminderDiscord
 {
@@ -14,24 +17,51 @@ class ReminderDiscord
     {
         $discord->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) { // 1
             if (str_starts_with($message->content, 'remind me to')) {
+                self::reminderCommand($message);
+            }
 
-                $reminder = ReminderService::parseCommand($message->content);
+            if ($message->content === 'reminders') {
+                $reminders = Reminder::where('user_id', $message->author->id)->get();
 
-                if (is_array($reminder) && isset($reminder['date']) && isset($reminder['message'])) {
-                    $reminder = Reminder::create([
-                        'date' => $reminder['date'],
-                        'message' => $reminder['message'],
-                        'user_id' => $message->author->id,
-                        'channel_id' => $message->channel_id,
-                        'message_id' => $message->id,
-                    ]);
+                $embed = new Embed($discord);
+                $embed->setTitle("Your reminders:");
+                $embed->type = Embed::TYPE_RICH;
+
+                if (!$reminders || $reminders->isEmpty()) {
+                    $message->reply("You don't have any reminders.");
+                    return;
                 }
 
-                if ($reminder instanceof Reminder) {
-                    $message->react('🐸');
+                foreach ($reminders as $reminder) {
+                    $embed->addFieldValues(
+                        $reminder->message,
+                        "<t:" . $reminder->date->unix() . ":R>",
+                        false
+                    );
                 }
+
+                $message->reply(MessageBuilder::new()->setContent('test')->addEmbed($embed));
             }
         });
+    }
+
+    private static function reminderCommand($message)
+    {
+        $reminder = ReminderService::parseCommand($message->content);
+
+        if (is_array($reminder) && isset($reminder['date']) && isset($reminder['message'])) {
+            $reminder = Reminder::create([
+                'date' => $reminder['date'],
+                'message' => $reminder['message'],
+                'user_id' => $message->author->id,
+                'channel_id' => $message->channel_id,
+                'message_id' => $message->id,
+            ]);
+        }
+
+        if ($reminder instanceof Reminder) {
+            $message->react('🐸');
+        }
     }
 
     public static function check($app, $discord)
