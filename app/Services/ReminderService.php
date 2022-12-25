@@ -50,6 +50,11 @@ class ReminderService
         // put this in a try/catch block
         try {
             $date = \Carbon\Carbon::parse($dateString);
+
+            // if the date is in the past, add a year to it
+            if ($date->isPast()) {
+                $date->addYear();
+            }
         } catch (\Exception $e) {
             // if it fails then they probably didn't put a date in the command
             // just return the initial message and null date
