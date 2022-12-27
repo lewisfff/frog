@@ -35,7 +35,7 @@ class ReminderDiscord
                 foreach ($reminders as $reminder) {
                     $embed->addFieldValues(
                         $reminder->message,
-                        "<t:" . $reminder->date->unix() . ":R>",
+                        ($reminder->date ? "<t:" . $reminder->date->unix() . ":R>" : "No date set"),
                         false
                     );
                 }
@@ -49,7 +49,7 @@ class ReminderDiscord
     {
         $reminder = ReminderService::parseCommand($message->content);
 
-        if (is_array($reminder) && isset($reminder['date']) && isset($reminder['message'])) {
+        if (is_array($reminder) && isset($reminder['message'])) {
             $reminder = Reminder::create([
                 'date' => $reminder['date'],
                 'message' => $reminder['message'],
