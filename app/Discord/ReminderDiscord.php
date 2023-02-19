@@ -71,6 +71,10 @@ class ReminderDiscord
         foreach ($reminders as $reminder) {
             $channel = $discord->getChannel($reminder->channel_id);
 
+            if (!$channel) {
+                return false;
+            }
+
             $channel->messages->fetch($reminder->message_id)
                 ->done(function ($message) use ($reminder) {
                     $message->reply('🐸');
