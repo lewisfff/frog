@@ -72,6 +72,7 @@ class ReminderDiscord
             $channel = $discord->getChannel($reminder->channel_id);
 
             if (!$channel) {
+                $reminder->delete();
                 return false;
             }
 
